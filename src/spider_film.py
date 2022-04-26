@@ -8,6 +8,7 @@ import math
 import time
 
 import requests
+import unicodedata
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from sqlalchemy import and_
@@ -81,7 +82,8 @@ def save_film_information(db, subject_id, FilmInformation, film_html):
     film_information = FilmInformation(
         name=soup.find("h1").find("span").text,
         subject_id=subject_id,
-        score=float(soup.find("strong", class_="rating_num").text),
+        score=float(soup.find("strong", class_="rating_num").text) if is_number(
+            soup.find("strong", class_="rating_num").text) else 0,
         country_or_region=get_text_by_info(info, "制片国家/地区"),
         language=get_text_by_info(info, "语言"),
         release_date=get_text_by_info(info, "上映日期"),
@@ -121,15 +123,18 @@ def get_text_by_info(info, flag):
     if result is not None:
         if flag == "上映日期":
             result = result[0:9]
+            if "(" in result:
+                result = result.split("(")[0] + "-01-01"
         elif flag == "片长":
             temp = ""
-            for char in result.split("/")[0].split("-")[0].split("分钟")[0]:
+            for char in result.split("/")[0].split("-")[0].split("分钟")[0].split("分")[0]:
                 if char.isdigit():
                     temp += char
             result = temp
         elif flag == "制片国家/地区":
             if len(result) >= 1 and "/" in result:
                 result = result.split("/")[0]
+            if "中国" in result:
                 for name in ["大陆", "香港", "澳门", "台湾"]:
                     if name in result:
                         result = "中国"
@@ -146,7 +151,10 @@ def save_director(db, Director, film_html, film_information_id):
     保存电影信息中的导演
     :return:
     """
-    director_name_list = get_text_by_info(get_info(process_html(film_html)), "导演").split("/")
+    director_name_list = []
+    directors_name = get_text_by_info(get_info(process_html(film_html)), "导演")
+    if director_name_list is not None:
+        director_name_list = directors_name.split("/")
     for director_name in director_name_list:
         if director_name is not None:
             director = Director(
@@ -166,7 +174,10 @@ def save_performer(db, Performer, film_html, film_information_id):
     保存电影信息中的演员
     :return:
     """
-    performer_name_list = get_text_by_info(get_info(process_html(film_html)), "主演").split("/")
+    performer_name_list = []
+    performers_name = get_text_by_info(get_info(process_html(film_html)), "主演")
+    if performer_name_list is not None:
+        performer_name_list = performers_name.split("/")
     for performer_name in performer_name_list:
         if performer_name is not None:
             performer = Performer(
@@ -186,7 +197,10 @@ def save_film_type(db, FilmType, film_html, film_information_id):
     保存电影信息中的类型
     :return:
     """
-    film_type_name_list = get_text_by_info(get_info(process_html(film_html)), "类型").split("/")
+    film_type_name_list = []
+    film_types_name = get_text_by_info(get_info(process_html(film_html)), "类型")
+    if film_type_name_list is not None:
+        film_type_name_list = film_types_name.split("/")
     for film_type_name in film_type_name_list:
         if film_type_name is not None:
             film_type = FilmType(
@@ -278,3 +292,19 @@ def real_pull(db, Film, FilmInformation, Director, Performer, FilmType, start_nu
         Film.query.filter(Film.subject_id == subject_id).update({"status": film_status.get("pull")})
         time.sleep(5)
     return True
+
+
+def is_number(s):
+    try:
+        # 如果能运行float(s)语句，返回True（字符串s是浮点数）
+        float(s)
+        return True
+    except ValueError:
+        pass
+    try:
+        # 把一个表示数字的字符串转换为浮点数返回的函数
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+    return False

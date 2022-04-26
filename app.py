@@ -2,6 +2,8 @@
 import json
 from datetime import timedelta
 
+import numpy
+import pandas as pd
 import pymysql
 from flask import Flask
 from flask import redirect, url_for
@@ -41,35 +43,15 @@ def get_film_language_top():
     电影语言top
     :return:
     """
-    string = """
-        [
-            {
-                "language": "普通话",
-                "total": 1
-            },
-            {
-                "language": "英语",
-                "total": 2
-            },
-            {
-                "language": "日语",
-                "total": 3
-            },
-            {
-                "language": "韩语",
-                "total": 4
-            },
-            {
-                "language": "俄语",
-                "total": 5
-            },
-            {
-                "language": "粤语",
-                "total": 6
-            }
-        ]
-    """
-    return json.dumps(json.loads(string))
+    film_information_all = FilmInformation.query.all()
+    film_language_top = pd.DataFrame(list(map(lambda x: x.__self_dict__(), film_information_all)))[
+                            "language"].value_counts().sort_values(ascending=False)[:10]
+    film_language_top = film_language_top.reset_index()
+    film_language_top["total"] = film_language_top["language"]
+    film_language_top["name"] = film_language_top["index"]
+
+    return film_language_top.to_json(orient="records")
+
 
 @app.route('/film/score/length/relation', methods=['GET'])
 def get_score_length_relation():
@@ -77,27 +59,16 @@ def get_score_length_relation():
     评分-时长关系
     :return:
     """
-    string = """
-[
-  {
-    "length": 114,
-    "score": 1.5
-  },
-  {
-    "length": 100,
-    "score": 2.4
-  },
-  {
-    "length": 33,
-    "score": 3.6
-  },
-  {
-    "length": 67,
-    "score": 9.5
-  }
-]
-    """
-    return json.dumps(json.loads(string))
+    film_information_all = FilmInformation.query.all()
+    film_information_pd = pd.DataFrame(list(map(lambda x: x.__self_dict__(), film_information_all)))
+    res = pd.DataFrame()
+    res["length"] = film_information_pd["film_length"]
+    res["score"] = film_information_pd["score"]
+    res = res.replace(['', ' ', 'None', None, 'NULL', 'null', 'Null'], numpy.nan).dropna()
+    res["length"] = res["length"].apply(pd.to_numeric, errors='coerce')
+    res = res.sort_values(by="length", ascending=False)
+
+    return res.to_json(orient="records")
 
 
 @app.route('/film/director/films', methods=['GET'])
@@ -106,36 +77,73 @@ def get_director_films():
     导演电影数量Top n
     :return:
     """
-    string = """
-[
-  {
-    "name": "小明",
-    "total": 20
-  },
-  {
-    "name": "小黄",
-    "total": 1
-  },
-  {
-    "name": "小王",
-    "total": 11
-  },
-  {
-    "name": "小李",
-    "total": 5
-  }
-]
+    director_all = Director.query.all()
+    director_top = pd.DataFrame(list(map(lambda x: x.__self_dict__(), director_all)))[
+                       "name"].value_counts().sort_values(ascending=False)[:10]
+    director_top = director_top.reset_index()
+    director_top["total"] = director_top["name"]
+    director_top["name"] = director_top["index"]
+
+    return director_top.to_json(orient="records")
+
+
+@app.route('/film/type', methods=['GET'])
+def get_film_type():
     """
-    return json.dumps(json.loads(string))
+    电影类型
+    :return:
+    """
+    film_type_all = FilmType.query.all()
+    film_type_top = pd.DataFrame(list(map(lambda x: x.__self_dict__(), film_type_all)))[
+        "name"].value_counts().sort_values(ascending=False)
+    film_type_top = film_type_top.reset_index()
+    film_type_top['value'] = film_type_top['name']
+    film_type_top["name"] = film_type_top["index"]
+
+    return film_type_top.to_json(orient="records")
 
 
-# @app.route('/pull/film', methods=['GET'])
-# def pull_film():
-#     """
-#     拉取电影
-#     :return:
-#     """
-#     return spider_film.pull_film(db, Film, FilmInformation, Director, Performer, FilmType)
+@app.route('/film/country/count', methods=['GET'])
+def get_film_country_count():
+    """
+    各国电影计数
+    :return:
+    """
+    film_information_all = FilmInformation.query.all()
+    film_country_or_region_top = pd.DataFrame(list(map(lambda x: x.__self_dict__(), film_information_all)))[
+                                     "country_or_region"].value_counts().sort_values(ascending=False)
+    film_country_or_region_top = film_country_or_region_top.reset_index()
+    film_country_or_region_top["total"] = film_country_or_region_top["country_or_region"]
+    film_country_or_region_top["name"] = film_country_or_region_top["index"]
+
+    return film_country_or_region_top.to_json(orient="records")
+
+
+@app.route('/film/statistics', methods=['GET'])
+def get_film_statistics():
+    """
+    电影数量统计
+    :return:
+    """
+    film_information_all = FilmInformation.query.all()
+    director_all = Director.query.all()
+    performer_all = Performer.query.all()
+    film_type_all = FilmType.query.all()
+
+    film_total = int(len(film_information_all))
+    country_total = int(len(
+        list(set(list(map(lambda film_information: film_information.country_or_region, film_information_all))))))
+    film_type_total = int(len(list(set(list(map(lambda film_type: film_type.name, film_type_all))))))
+    director_total = int(len(list(set(list(map(lambda director: director.name, director_all))))))
+    performer_total = int(len(list(set(list(map(lambda performer: performer.name, performer_all))))))
+
+    return json.dumps({
+        "film_total": film_total,
+        "country_total": country_total,
+        "film_type_total": film_type_total,
+        "director_total": director_total,
+        "performer_total": performer_total
+    })
 
 
 # ##################################################################################
@@ -149,40 +157,6 @@ def pull_film():
 
 
 # #############################################################################################
-
-# class Jobs(object):
-#     """
-#     定时任务
-#     """
-#
-#     @staticmethod
-#     def pull_global():
-#         """
-#         从腾讯API拉取全球数据并保持
-#         :return:
-#         """
-#         is_add_or_update = tencent_request_service.save_global_data(
-#             db=db,
-#             GlobalWomWorld=GlobalWomWorld,
-#             GlobalWomAboard=GlobalWomAboard,
-#             GlobalDaily=GlobalDaily)
-#         db.session.close()
-#         return is_add_or_update
-#
-#     @staticmethod
-#     def pull_china():
-#         """
-#         从腾讯API拉取国内数据并保持
-#         :return:
-#         """
-#         is_add_or_update = tencent_request_service.save_china(
-#             db,
-#             ChinaTotal=ChinaTotal,
-#             ChinaCompareDaily=ChinaCompareDaily,
-#             ChinaProvince=ChinaProvince,
-#             ChinaCity=ChinaCity)
-#         db.session.close()
-#         return is_add_or_update
 
 
 def app_init():

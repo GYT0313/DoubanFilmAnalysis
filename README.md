@@ -1,6 +1,8 @@
 # DoubanFilmAnalysis
 豆瓣电影可视化分析
 
+pip install pyspark -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 pip install beautifulsoup4==4.11.1 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 pip install fake_useragent==0.1.11 -i https://pypi.tuna.tsinghua.edu.cn/simple

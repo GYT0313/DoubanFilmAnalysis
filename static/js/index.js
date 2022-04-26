@@ -3,20 +3,21 @@
 // 中间累计数据
 (function () {
     $.ajax({
-        url: 'http://127.0.0.1:5000/global/data',
+        url: 'http://127.0.0.1:5001/film/statistics',
         type: 'get',
         // data: {},
         dataType: 'json',
     }).then((data) => {
-        let sum = data.confirm
-        let cureSum = data.heal
-        $(".no-hd-global li:first").text(sum)
-        $(".no-hd-global li:nth-child(2)").text(cureSum)
+        $(".no-hd li:first").text(data.film_total)
+        $(".no-hd li:nth-child(2)").text(data.film_type_total)
+        $(".no-hd li:nth-child(3)").text(data.director_total)
+        $(".no-hd li:nth-child(4)").text(data.performer_total)
+        $(".no-hd li:last").text(data.country_total)
     })
 })();
 
 
-// 1、各大洲累计确诊分布(不包含国内)（饼图）
+// 1、语言占比（饼图）
 (function () {
     //初识化ECharts
     var myChart = echarts.init(document.querySelector(".bar .chart"));
@@ -36,7 +37,7 @@
         series: [{
             name: '电影语言Top10',
             type: 'pie',
-            radius: [20, 70],
+            radius: [50, 100],
             center: ['50%', '50%'],
             roseType: 'radius',
             // data:
@@ -52,7 +53,7 @@
         dataType: 'json',
         success: function (data) {
             data.forEach(x => count.push({
-                name: x['language'],
+                name: x['name'],
                 value: x['total']
             }))
 
@@ -74,35 +75,6 @@
 
 // 3、评分-片长关系
 (function () {
-
-    // // 初始化绘制图表的echarts实例
-    // var myChart = echarts.init(document.querySelector('.line .chart'))
-    //
-    // // 指定图表的配置
-    // var option = {
-    //     title:{
-    //         text:"片长-评分关系"
-    //     },
-    //     tooltip:{},//提示框
-    //     legend:{
-    //         data:['人数']
-    //     },
-    //     xAxis:{
-    //         data:['vue','react','angular','jquery']    //x轴
-    //     },
-    //     yAxis:{},    //不写的话，y轴默认就标出数字
-    //     //=====图标的数据
-    //     series:[
-    //         {
-    //             name:"人数",    //鼠标放上去浮现的内容，跟data一样
-    //             type:"bar",     //指定条形图类型
-    //             data:[2000,1500,500,2200]      //分别对应vue、react那几个x轴的数值
-    //         }
-    //     ]
-    // }
-    // // 对实例对象设置配置
-    // myChart.setOption(option)
-
     var myChart = echarts.init(document.querySelector('.line .chart'))
 
     var option = {
@@ -126,13 +98,16 @@
         xAxis: {
             type: 'category'
         },
+        axisLabel: {
+            color: '#FFFFFF'
+        },
         yAxis: {},
         series: [
             {
                 name: '片长-评分',
                 type: 'scatter',
                 seriesLayoutBy: 'row',
-                symbolSize: 10,
+                symbolSize: 4,
                 itemStyle: {
                     color: '#e48'
                 }
@@ -172,25 +147,46 @@
     })
 })();
 
+function randomColor() {
+    return 'rgb(' + [
+        Math.round(Math.random() * 160),
+        Math.round(Math.random() * 160),
+        Math.round(Math.random() * 160)
+    ].join(',') + ')';
+}
 
-// 2、导演数量top n
+// 导演数量top n
 (function () {
     // 初始化绘制图表的echarts实例
     var myChart = echarts.init(document.querySelector('.bar1 .chart'))
 
     // 指定图表的配置
     var option = {
-        tooltip:{},//提示框
-        xAxis:{
-            data:[]    //x轴
+        tooltip: {},//提示框
+        xAxis: {
+            axisLabel: {
+                //x轴文字的配置
+                show: true,
+                interval: 0,//使x轴文字显示全
+                rotate: -35
+            },
+            data: []    //x轴
         },
-        yAxis:{},    //不写的话，y轴默认就标出数字
+        grid: {
+            left: '5%',
+            top: '15%',
+            containLabel: true
+        },
+        axisLabel: {
+            color: '#FFFFFF',
+        },
+        yAxis: {},    //不写的话，y轴默认就标出数字
         //=====图标的数据
-        series:[
+        series: [
             {
-                name:"电影数量",    //鼠标放上去浮现的内容，跟data一样
-                type:"bar",     //指定条形图类型
-                data:[]      //分别对应vue、react那几个x轴的数值
+                name: "电影数量",    //鼠标放上去浮现的内容，跟data一样
+                type: "bar",     //指定条形图类型
+                data: []      //分别对应vue、react那几个x轴的数值
             }
         ]
     }
@@ -209,7 +205,7 @@
                 x.push(item["name"])
                 y.push(item["total"])
             })
-            console.log(x)
+
             //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
                 xAxis: {
@@ -231,6 +227,63 @@
     });
 })();
 
+
+// 电影类型
+(function () {
+    // 初始化绘制图表的echarts实例
+    var myChart = echarts.init(document.querySelector('.line1 .chart'))
+
+    $.ajax({
+        url: 'http://127.0.0.1:5001/film/type',
+        type: 'get',
+        // data: {},
+        dataType: 'json',
+        success: function (data) {
+            var res = data.map(val => ({
+                ...val,
+                textStyle: {
+                    normal: {
+                        color: randomColor()
+                    }
+                }
+            }));
+
+            //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
+            myChart.setOption({
+                series: [{
+                    type: 'wordCloud',
+                    shape: 'circle',
+                    left: 'center',
+                    top: 'center',
+                    right: null,
+                    bottom: null,
+                    width: '100%',
+                    height: '95%',
+                    sizeRange: [12, 70],
+                    rotationRange: [-30, 30],
+                    rotationStep: 8,
+                    gridSize: 10,
+                    drawOutOfBound: false,
+                    textStyle: {
+                        normal: {
+                            fontFamily: 'sans-serif',
+                            fontWeight: 'normal'
+                        },
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowColor: '#333'
+                        }
+                    },
+                    data: res
+                }]
+            })
+        }
+    })
+
+    window.addEventListener("resize", function () {
+        myChart.resize();
+    });
+})();
 
 
 // 4、全球电影地图（地图）
@@ -454,8 +507,7 @@
     }
     var option = {
         title: {
-            text: '全球各国电影数量统计',
-            // subtext: '累计确诊人数',
+            text: '各国电影数量',
             left: 'center',
             textStyle: {
                 color: 'white'
@@ -467,21 +519,13 @@
             formatter: function (params) {
                 // var value = params.value + '';
                 // return params.seriesName + '<br/>' + params.name + ' : ' + params.data[2] + '人';
-                return "所在地: " + params.data.continent + "</br>" +
-                    "国家: " + params.data.name + "</br>" +
-                    "现有确诊: " + params.data.now_confirm + "</br>" +
-                    "累计确诊: " + params.data.confirm + "</br>" +
-                    "累计死亡: " + params.data.dead + "</br>" +
-                    "累计治愈: " + params.data.heal + "</br>" +
-                    "较昨日确诊: " + (params.data.confirm_add > 0 ? '+' + params.data.confirm_add : params.data.confirm_add) + "</br>" +
-                    "较昨日死亡: " + (params.data.dead_compare > 0 ? '+' + params.data.dead_compare : params.data.dead_compare) + "</br>" +
-                    "较昨日治愈: " + (params.data.heal_compare > 0 ? '+' + params.data.heal_compare : params.data.heal_compare) + "</br>" +
-                    "较昨日现有确诊: " + (params.data.now_confirm_compare > 0 ? '+' + params.data.now_confirm_compare : params.data.now_confirm_compare);
+                return "国家: " + params.data.name + "</br>" +
+                    "电影计数: " + params.data.value;
             }
         },
         visualMap: {
             min: 0,
-            max: 5000000,
+            max: 400,
             text: ['High', 'Low'],
             realtime: false,
             calculable: false,
@@ -491,7 +535,7 @@
             color: ['#481380', '#7f78d2', '#efb1ff', '#ffe2ff']
         },
         series: [{
-            name: '累计确诊人数',
+            name: '电影计数',
             type: 'map',
             mapType: 'world',
             roam: true,
@@ -512,30 +556,24 @@
             // data:
         }]
     };
-    // 把配置和数据给实例对象
+// 把配置和数据给实例对象
     myChart.setOption(option);
     var virus = []
     $.ajax({
-        url: 'http://127.0.0.1:5000/china/total',
+        url: 'http://127.0.0.1:5001/film/country/count',
         type: 'get',
         // data: {},
         dataType: 'json',
         success: function (data) {
-            virus.push({
-                'continent': data.continent,
-                // 用于visualMap与地图区域对应
-                'name': data.name,
-                'confirm': data.confirm,
-                'confirm_add': data.confirm_add,
-                'dead': data.dead,
-                'dead_compare': data.dead_compare,
-                'heal': data.heal,
-                'heal_compare': data.heal_compare,
-                'now_confirm': data.now_confirm,
-                'now_confirm_compare': data.now_confirm_compare,
-                // 用于visualMap筛选, 颜色显示
-                'value': data.confirm
+            data.forEach(item => {
+                virus.push({
+                    // 用于visualMap与地图区域对应
+                    'name': item.name,
+                    // 用于visualMap筛选, 颜色显示
+                    'value': item.total
+                })
             })
+
             myChart.setOption({ //加载数据图表
                 series: [{
                     // 根据名字对应到相应的系列
@@ -544,39 +582,7 @@
             })
         }
     });
-    $.ajax({
-        // 全球电影地图
-        url: 'http://127.0.0.1:5000/global/map',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            data.forEach(item => {
-                virus.push({
-                    'continent': item.continent,
-                    // 用于visualMap与地图区域对应
-                    'name': item.name,
-                    'confirm': item.confirm,
-                    'confirm_add': item.confirm_add,
-                    'dead': item.dead,
-                    'dead_compare': item.dead_compare,
-                    'heal': item.heal,
-                    'heal_compare': item.heal_compare,
-                    'now_confirm': item.now_confirm,
-                    'now_confirm_compare': item.now_confirm_compare,
-                    // 用于visualMap筛选, 颜色显示
-                    'value': item.confirm
-                })
-            })
 
-            //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
-            myChart.setOption({ //加载数据图表
-                series: [{
-                    // 根据名字对应到相应的系列
-                    data: virus
-                }]
-            })
-        }
-    })
     window.addEventListener('resize', function () {
         myChart.resize()
     })
