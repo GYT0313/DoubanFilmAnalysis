@@ -1,6 +1,11 @@
 # DoubanFilmAnalysis
 豆瓣电影可视化分析
 
+# 部署步骤
+1、新建数据库名称: douban_film_analysis
+
+2、安装以下库
+
 pip install pyspark==3.2.1 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 pip install beautifulsoup4==4.11.1 -i https://pypi.tuna.tsinghua.edu.cn/simple
