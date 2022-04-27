@@ -13,11 +13,15 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from sqlalchemy import and_
 
-from common_config import *
-
 base_url = "https://movie.douban.com"
 
 film_url = "/j/new_search_subjects?sort=U&range=0,10&tags=&start=%s"
+
+# film状态
+film_status = {
+    "pull": "是",
+    "not_pull": "否"
+}
 
 
 def request(url):
@@ -230,13 +234,16 @@ def pull_film(db, Film, FilmInformation, Director, Performer, FilmType):
     """
     # 从mysql获取最新not_pull的电影的id, 从这里开始拉取
     start_num = 0
+    num = 0
     not_pull_film_list = Film.query.filter(Film.status == film_status.get("not_pull")).order_by(Film.id).limit(1).all()
     if len(not_pull_film_list) >= 1:
         num = math.floor(not_pull_film_list[0].id / 20) - 1
-        if num <= 0:
-            start_num = 0
-        else:
-            start_num = num * 20
+    else:
+        pull_film_list = Film.query.filter(Film.status == film_status.get("pull")).order_by(Film.id).limit(1).all()
+        if len(pull_film_list) >= 1:
+            num = math.floor(not_pull_film_list[0].id / 20) - 1
+    if num > 0:
+        start_num = num * 20
 
     success = False
     retry_num = 3

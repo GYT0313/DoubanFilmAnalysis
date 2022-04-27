@@ -17,7 +17,7 @@
 })();
 
 
-// 1、语言占比（饼图）
+// 1、语言占比 -饼图
 (function () {
     //初识化ECharts
     var myChart = echarts.init(document.querySelector(".bar .chart"));
@@ -73,7 +73,7 @@
 })();
 
 
-// 3、评分-片长关系
+// 3、评分-片长关系 - 散点图
 (function () {
     var myChart = echarts.init(document.querySelector('.line .chart'))
 
@@ -96,12 +96,15 @@
         //     ]
         // },
         xAxis: {
+            name: '分钟',
             type: 'category'
         },
         axisLabel: {
             color: '#FFFFFF'
         },
-        yAxis: {},
+        yAxis: {
+            name: '评分'
+        },
         series: [
             {
                 name: '片长-评分',
@@ -117,7 +120,6 @@
 
     myChart.setOption(option);
 
-    //  全球电影趋势
     $.ajax({
         url: 'http://127.0.0.1:5001/film/score/length/relation',
         type: 'get',
@@ -155,15 +157,23 @@ function randomColor() {
     ].join(',') + ')';
 }
 
-// 导演数量top n
+// 导演数量top n -柱状图
 (function () {
     // 初始化绘制图表的echarts实例
     var myChart = echarts.init(document.querySelector('.bar1 .chart'))
 
     // 指定图表的配置
     var option = {
-        tooltip: {},//提示框
+        tooltip: {//提示框组件
+            trigger: 'item', //item数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+            axisPointer: {
+                // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+            },
+            formatter: '{b} <br/>电影计数 : {c}' //{a}（系列名称），{b}（数据项名称），{c}（数值）, {d}（百分比）
+        },
         xAxis: {
+            name: '姓名',
             axisLabel: {
                 //x轴文字的配置
                 show: true,
@@ -180,7 +190,9 @@ function randomColor() {
         axisLabel: {
             color: '#FFFFFF',
         },
-        yAxis: {},    //不写的话，y轴默认就标出数字
+        yAxis: {
+            name: '数量'
+        },    //不写的话，y轴默认就标出数字
         //=====图标的数据
         series: [
             {
@@ -228,7 +240,7 @@ function randomColor() {
 })();
 
 
-// 电影类型
+// 电影类型-词云
 (function () {
     // 初始化绘制图表的echarts实例
     var myChart = echarts.init(document.querySelector('.line1 .chart'))
@@ -260,9 +272,9 @@ function randomColor() {
                     width: '100%',
                     height: '95%',
                     sizeRange: [12, 70],
-                    rotationRange: [-30, 30],
+                    rotationRange: [-25, 25],
                     rotationStep: 8,
-                    gridSize: 10,
+                    gridSize: 14,
                     drawOutOfBound: false,
                     textStyle: {
                         normal: {
@@ -271,11 +283,19 @@ function randomColor() {
                         },
                         emphasis: {
                             shadowBlur: 10,
-                            shadowColor: '#333'
+                            shadowColor: 'yellow'
                         }
                     },
                     data: res
-                }]
+                }],
+                tooltip: {//提示框组件
+                    trigger: 'item', //item数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+                    axisPointer: {
+                        // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    },
+                    formatter: '{b} <br/>电影计数 : {c}' //{a}（系列名称），{b}（数据项名称），{c}（数值）, {d}（百分比）
+                },
             })
         }
     })
@@ -286,7 +306,7 @@ function randomColor() {
 })();
 
 
-// 4、全球电影地图（地图）
+// 4、全球电影地图 -地图
 (function () {
     var myChart = echarts.init(document.querySelector('.map .chart'))
     var nameMap = {

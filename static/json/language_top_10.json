@@ -1,0 +1,42 @@
+[
+    {
+        "language": "英语",
+        "total": 1434
+    },
+    {
+        "language": "汉语普通话",
+        "total": 1074
+    },
+    {
+        "language": "日语",
+        "total": 329
+    },
+    {
+        "language": "粤语",
+        "total": 268
+    },
+    {
+        "language": "韩语",
+        "total": 221
+    },
+    {
+        "language": "法语",
+        "total": 60
+    },
+    {
+        "language": "西班牙语",
+        "total": 22
+    },
+    {
+        "language": "德语",
+        "total": 17
+    },
+    {
+        "language": "意大利语",
+        "total": 16
+    },
+    {
+        "language": "印地语",
+        "total": 13
+    }
+]
