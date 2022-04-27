@@ -6,6 +6,7 @@ import pymysql
 from pyspark import SparkConf, SparkContext
 
 """
+Spark版本: 3.2.1
 执行命令:
 spark-submit \
 --master spark \
