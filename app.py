@@ -4,6 +4,7 @@ import os
 from datetime import timedelta
 
 import pymysql
+import pandas as pd
 from flask import Flask
 from flask import redirect, url_for
 from flask import render_template

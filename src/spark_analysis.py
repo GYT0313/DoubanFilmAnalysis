@@ -46,7 +46,7 @@ def language_calculate():
     language_count_dict = rdd.map(lambda x: x[0]).countByValue()
     top_10_list = sorted(language_count_dict.items(), key=lambda x: x[1], reverse=True)
     result = list(map(lambda x: {
-        "language": x[0],
+        "name": x[0],
         "total": x[1]
     }, top_10_list[:10]))
 

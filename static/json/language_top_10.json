@@ -1,42 +1,42 @@
 [
     {
-        "language": "英语",
-        "total": 1434
+        "name": "英语",
+        "total": 1509
     },
     {
-        "language": "汉语普通话",
-        "total": 1074
+        "name": "汉语普通话",
+        "total": 1129
     },
     {
-        "language": "日语",
-        "total": 329
+        "name": "日语",
+        "total": 346
     },
     {
-        "language": "粤语",
-        "total": 268
+        "name": "粤语",
+        "total": 276
     },
     {
-        "language": "韩语",
-        "total": 221
+        "name": "韩语",
+        "total": 232
     },
     {
-        "language": "法语",
-        "total": 60
+        "name": "法语",
+        "total": 66
     },
     {
-        "language": "西班牙语",
-        "total": 22
+        "name": "西班牙语",
+        "total": 24
     },
     {
-        "language": "德语",
+        "name": "意大利语",
         "total": 17
     },
     {
-        "language": "意大利语",
-        "total": 16
+        "name": "德语",
+        "total": 17
     },
     {
-        "language": "印地语",
+        "name": "印地语",
         "total": 13
     }
 ]

@@ -1,31 +1,31 @@
 [
     {
         "name": "剧情",
-        "value": 1842
+        "value": 1939
     },
     {
         "name": "历史",
-        "value": 120
+        "value": 124
     },
     {
         "name": "战争",
-        "value": 125
+        "value": 133
     },
     {
         "name": "悬疑",
-        "value": 400
+        "value": 414
     },
     {
         "name": "惊悚",
-        "value": 454
+        "value": 473
     },
     {
         "name": "动作",
-        "value": 877
+        "value": 906
     },
     {
         "name": "喜剧",
-        "value": 966
+        "value": 1018
     },
     {
         "name": "脱口秀",
@@ -33,55 +33,55 @@
     },
     {
         "name": "科幻",
-        "value": 346
+        "value": 357
     },
     {
         "name": "冒险",
-        "value": 537
+        "value": 553
     },
     {
         "name": "犯罪",
-        "value": 545
+        "value": 568
     },
     {
         "name": "爱情",
-        "value": 796
+        "value": 843
     },
     {
         "name": "动画",
-        "value": 424
+        "value": 445
     },
     {
         "name": "奇幻",
-        "value": 502
+        "value": 525
     },
     {
         "name": "灾难",
-        "value": 41
+        "value": 44
     },
     {
         "name": "家庭",
-        "value": 194
+        "value": 209
     },
     {
         "name": "传记",
-        "value": 106
+        "value": 111
     },
     {
         "name": "运动",
-        "value": 41
+        "value": 43
     },
     {
         "name": "音乐",
-        "value": 50
+        "value": 56
     },
     {
         "name": "同性",
-        "value": 60
+        "value": 65
     },
     {
         "name": "西部",
-        "value": 23
+        "value": 24
     },
     {
         "name": "歌舞",
@@ -89,31 +89,31 @@
     },
     {
         "name": "古装",
-        "value": 230
+        "value": 236
     },
     {
         "name": "恐怖",
-        "value": 137
+        "value": 148
     },
     {
         "name": "情色",
-        "value": 24
+        "value": 26
     },
     {
         "name": "真人秀",
-        "value": 31
+        "value": 34
     },
     {
         "name": "纪录片",
-        "value": 36
+        "value": 40
     },
     {
         "name": "武侠",
-        "value": 91
+        "value": 94
     },
     {
         "name": "儿童",
-        "value": 35
+        "value": 40
     },
     {
         "name": "戏曲",
@@ -121,7 +121,7 @@
     },
     {
         "name": "短片",
-        "value": 19
+        "value": 21
     },
     {
         "name": "鬼怪",
